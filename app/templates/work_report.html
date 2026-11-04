@@ -1,0 +1,208 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Work Reports | Freelancer Manager{% endblock %}
+
+{% block content %}
+
+<style>
+    .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .report-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 18px;
+        margin-bottom: 25px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 22px;
+        border-radius: 12px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+
+    .stat-card h3 {
+        color: #64748B;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .stat-card h1 {
+        color: #3979C9;
+        margin: 0;
+        font-size: 30px;
+    }
+
+    .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        min-width: 650px;
+    }
+
+    .report-table th,
+    .report-table td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #E5EAF1;
+    }
+
+    .report-table th {
+        background: #EAF3FF;
+        color: #24436B;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+        border-radius: 12px;
+    }
+
+    .progress-bg {
+        background: #DCEBFA;
+        height: 9px;
+        border-radius: 10px;
+        overflow: hidden;
+        min-width: 90px;
+    }
+
+    .progress-fill {
+        background: #3979C9;
+        height: 9px;
+    }
+
+    .export-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+</style>
+
+<div class="report-header">
+
+    <div>
+        <h1>Work Reports</h1>
+        <p>Track your project performance and task completion.</p>
+    </div>
+
+    <div class="export-buttons">
+
+        <a href="{% url 'export_excel' %}" class="btn btn-primary">
+            Download Excel
+        </a>
+
+        <a href="{% url 'export_pdf' %}" class="btn btn-secondary">
+            Download PDF
+        </a>
+
+    </div>
+
+</div>
+
+<!-- Summary Cards -->
+
+<div class="report-stats">
+
+    <div class="stat-card">
+        <h3>Total Projects</h3>
+        <h1>{{ total_projects }}</h1>
+    </div>
+
+    <div class="stat-card">
+        <h3>Completed Projects</h3>
+        <h1>{{ completed_projects }}</h1>
+    </div>
+
+    <div class="stat-card">
+        <h3>Total Tasks</h3>
+        <h1>{{ total_tasks }}</h1>
+    </div>
+
+    <div class="stat-card">
+        <h3>Completed Tasks</h3>
+        <h1>{{ completed_tasks }}</h1>
+    </div>
+
+</div>
+
+<!-- Project Report Table -->
+
+<div class="card">
+
+    <h2>Project Performance</h2>
+    <p>Detailed progress of your projects.</p>
+
+    <div class="table-wrapper">
+
+        <table class="report-table">
+
+            <thead>
+                <tr>
+                    <th>Project Name</th>
+                    <th>Status</th>
+                    <th>Start Date</th>
+                    <th>Due Date</th>
+                    <th>Total Tasks</th>
+                    <th>Completed Tasks</th>
+                    <th>Progress</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for item in report_data %}
+
+                <tr>
+
+                    <td>
+                        <strong>{{ item.project.title }}</strong>
+                    </td>
+
+                    <td>{{ item.project.status }}</td>
+
+                    <td>{{ item.project.start_date }}</td>
+
+                    <td>{{ item.project.due_date }}</td>
+
+                    <td>{{ item.total_tasks }}</td>
+
+                    <td>{{ item.completed_tasks }}</td>
+
+                    <td>
+                        <strong>{{ item.progress }}%</strong>
+
+                        <div class="progress-bg">
+                            <div class="progress-fill"
+                                 style="width: {{ item.progress }}%;">
+                            </div>
+                        </div>
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="7" style="text-align:center;">
+                        No project reports available yet.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

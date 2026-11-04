@@ -1,0 +1,42 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Delete Project{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+
+        <div class="custom-card text-center">
+
+            <h2 class="text-danger">Delete Project?</h2>
+
+            <p>
+                Are you sure you want to delete
+                <strong>{{ project.title }}</strong>?
+            </p>
+
+            <p class="text-muted">
+                All its milestones and tasks will also be deleted.
+            </p>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <button type="submit" class="btn btn-danger">
+                    Yes, Delete
+                </button>
+
+                <a href="{% url 'project_list' %}"
+                   class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,106 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | Freelancer Manager{% endblock %}
+
+{% block content %}
+
+<h1>Welcome to Your Dashboard</h1>
+<p>Manage your projects, milestones and daily tasks.</p>
+
+<div style="display:flex; gap:18px; flex-wrap:wrap; margin:25px 0;">
+
+    <div class="card" style="flex:1; min-width:180px;">
+        <h3>Total Projects</h3>
+        <h1 style="color:#3979C9;">{{ total_projects|default:0 }}</h1>
+    </div>
+
+    <div class="card" style="flex:1; min-width:180px;">
+        <h3>Completed Projects</h3>
+        <h1 style="color:#22966B;">{{ completed_projects|default:0 }}</h1>
+    </div>
+
+    <div class="card" style="flex:1; min-width:180px;">
+        <h3>Total Tasks</h3>
+        <h1 style="color:#3979C9;">{{ total_tasks|default:0 }}</h1>
+    </div>
+
+    <div class="card" style="flex:1; min-width:180px;">
+        <h3>Completed Tasks</h3>
+        <h1 style="color:#22966B;">{{ completed_tasks|default:0 }}</h1>
+    </div>
+
+</div>
+
+<div style="display:flex; justify-content:space-between;
+            align-items:center; flex-wrap:wrap; gap:15px;">
+
+    <h2>Project Overview</h2>
+
+    <a href="{% url 'project_create' %}" class="btn btn-primary">
+        + Add Project
+    </a>
+
+</div>
+
+<div class="card">
+
+    {% if projects %}
+
+        {% for project in projects %}
+
+            <div style="padding:15px 0; border-bottom:1px solid #E5EAF1;">
+
+                <h3>{{ project.title }}</h3>
+
+                <p>{{ project.description }}</p>
+
+                <p>
+                    <strong>Status:</strong>
+                    {{ project.status }}
+                </p>
+
+                <p>
+                    <strong>Due Date:</strong>
+                    {{ project.due_date }}
+                </p>
+
+                <p>
+                    <strong>Progress:</strong>
+                    {{ project.progress }}%
+                </p>
+
+                <div style="background:#DCEBFA; height:10px;
+                            border-radius:10px; overflow:hidden;">
+
+                    <div style="background:#3979C9;
+                                width:{{ project.progress }}%;
+                                height:10px;">
+                    </div>
+
+                </div>
+
+                <br>
+
+                <a href="{% url 'project_detail' project.id %}"
+                   class="btn btn-secondary">
+                    View Project
+                </a>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>No projects available yet. Start by creating your first project!</p>
+
+        <a href="{% url 'project_create' %}" class="btn btn-primary">
+            Create Your First Project
+        </a>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
