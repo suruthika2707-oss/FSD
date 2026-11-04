@@ -1,128 +1,207 @@
-
 {% extends 'base.html' %}
-
-{% block title %}Project Details{% endblock %}
 
 {% block content %}
 
-<div class="custom-card">
+<div class="container mt-4">
 
-    <div class="d-flex justify-content-between align-items-center">
-        <h2>{{ project.title }}</h2>
+    <!-- Project Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>{{ project.title }}</h2>
+            <p class="text-muted">Project Details</p>
+        </div>
 
-        <a href="{% url 'project_list' %}"
-           class="btn btn-outline-secondary">
-            Back
+        <a href="{% url 'project_list' %}" class="btn btn-secondary">
+            Back to Projects
         </a>
     </div>
 
-    <p class="text-muted">{{ project.description }}</p>
+    <!-- Project Information -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
 
-    <p><strong>Start Date:</strong> {{ project.start_date }}</p>
-    <p><strong>Due Date:</strong> {{ project.due_date }}</p>
-    <p><strong>Status:</strong> {{ project.status }}</p>
+            <h5>Project Information</h5>
 
-    <h5>Overall Project Progress</h5>
+            <p>
+                <strong>Description:</strong>
+                {{ project.description|default:"No description available" }}
+            </p>
 
-    <div class="progress mb-2">
-        <div class="progress-bar"
-             style="width: {{ progress }}%">
+            <p>
+                <strong>Start Date:</strong>
+                {{ project.start_date|default:"Not specified" }}
+            </p>
+
+            <p>
+                <strong>Due Date:</strong>
+                {{ project.due_date|default:"Not specified" }}
+            </p>
+
+            <p>
+                <strong>Status:</strong>
+                {{ project.status }}
+            </p>
+
+            <!-- Overall Progress -->
+            <div class="mt-4">
+                <div class="d-flex justify-content-between">
+                    <strong>Overall Progress</strong>
+                    <strong>{{ progress }}%</strong>
+                </div>
+
+                <div class="progress mt-2" style="height: 20px;">
+                    <div
+                        class="progress-bar bg-success"
+                        role="progressbar"
+                        style="width: {{ progress }}%;"
+                        aria-valuenow="{{ progress }}"
+                        aria-valuemin="0"
+                        aria-valuemax="100">
+                        {{ progress }}%
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <strong>{{ progress }}% Completed</strong>
+    <!-- Milestones -->
+    <div class="card shadow-sm mb-4">
 
-    <hr>
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Milestones</h5>
 
-    <a href="{% url 'add_milestone' project.id %}"
-       class="btn btn-primary">
-        + Add Milestone
-    </a>
-
-</div>
-
-<div class="progress" style="height: 12px;">
-    <div class="progress-bar"
-         role="progressbar"
-         style="width: {{ progress }}%;"
-         aria-valuenow="{{ progress }}"
-         aria-valuemin="0"
-         aria-valuemax="100">
-    </div>
-</div>
-
-<p class="mt-2">{{ progress }}% Completed</p>
-
-
-<h3 class="mb-3">Project Milestones</h3>
-
-{% for milestone in milestones %}
-
-<div class="custom-card">
-
-    <div class="d-flex justify-content-between">
-        <h4>{{ milestone.title }}</h4>
-
-        <span class="badge bg-info">
-            {{ milestone.status }}
-        </span>
-    </div>
-
-    <p>{{ milestone.description }}</p>
-
-    <p><strong>Due Date:</strong> {{ milestone.due_date }}</p>
-
-    <hr>
-
-    <h5>Tasks</h5>
-
-    {% for task in milestone.tasks.all %}
-
-    <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-
-        <div>
-            {% if task.completed %}
-                <del>{{ task.title }}</del>
-                <span class="badge bg-success">Completed</span>
-            {% else %}
-                {{ task.title }}
-                <span class="badge bg-warning text-dark">Pending</span>
-            {% endif %}
+            <a href="{% url 'milestone_create' project.id %}"
+               class="btn btn-primary btn-sm">
+                + Add Milestone
+            </a>
         </div>
 
-        <form method="POST" action="{% url 'toggle_task' task.id %}">
-            {% csrf_token %}
+        <div class="card-body">
 
-            <button class="btn btn-sm btn-outline-primary">
-                {% if task.completed %}
-                    Mark Pending
-                {% else %}
-                    Mark Completed
-                {% endif %}
-            </button>
-        </form>
+            {% for milestone in milestones %}
 
+                <div class="border rounded p-3 mb-3">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <h6>{{ milestone.title }}</h6>
+
+                        <div>
+                            <a href="{% url 'milestone_update' milestone.id %}"
+                               class="btn btn-warning btn-sm">
+                                Edit
+                            </a>
+
+                            <a href="{% url 'milestone_delete' milestone.id %}"
+                               class="btn btn-danger btn-sm">
+                                Delete
+                            </a>
+                        </div>
+
+                    </div>
+
+                    <p>
+                        <strong>Status:</strong>
+                        {{ milestone.status }}
+                    </p>
+
+                    <p>
+                        <strong>Description:</strong>
+                        {{ milestone.description|default:"No description" }}
+                    </p>
+
+                    <p>
+                        <strong>Due Date:</strong>
+                        {{ milestone.due_date|default:"Not specified" }}
+                    </p>
+
+                    <!-- Tasks -->
+                    <div class="mt-3">
+
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0">Tasks</h6>
+
+                            <a href="{% url 'task_create' milestone.id %}"
+                               class="btn btn-success btn-sm">
+                                + Add Task
+                            </a>
+                        </div>
+
+                        {% for task in milestone.tasks.all %}
+
+                            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+
+                                <div>
+                                    <span>{{ task.title }}</span>
+
+                                    {% if task.completed %}
+                                        <span class="badge bg-success ms-2">
+                                            Completed
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark ms-2">
+                                            Pending
+                                        </span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="d-flex gap-2">
+
+                                    <!-- Complete / Pending -->
+                                    <form method="POST"
+                                          action="{% url 'toggle_task' task.id %}">
+                                        {% csrf_token %}
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-primary">
+                                            {% if task.completed %}
+                                                Mark Pending
+                                            {% else %}
+                                                Mark Complete
+                                            {% endif %}
+                                        </button>
+                                    </form>
+
+                                    <!-- Edit Task -->
+                                    <a href="{% url 'task_update' task.id %}"
+                                       class="btn btn-sm btn-warning">
+                                        Edit
+                                    </a>
+
+                                    <!-- Delete Task -->
+                                    <a href="{% url 'task_delete' task.id %}"
+                                       class="btn btn-sm btn-danger">
+                                        Delete
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        {% empty %}
+
+                            <p class="text-muted mt-2">
+                                No tasks added yet.
+                            </p>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            {% empty %}
+
+                <p class="text-muted">
+                    No milestones added yet. Click Add Milestone to create one.
+                </p>
+
+            {% endfor %}
+
+        </div>
     </div>
 
-    {% empty %}
-
-    <p class="text-muted">No tasks added yet.</p>
-
-    {% endfor %}
-
-    <a href="{% url 'add_task' milestone.id %}"
-       class="btn btn-sm btn-primary mt-3">
-        + Add Task
-    </a>
-
 </div>
-
-{% empty %}
-
-<div class="custom-card">
-    <p>No milestones added yet.</p>
-</div>
-
-{% endfor %}
 
 {% endblock %}
