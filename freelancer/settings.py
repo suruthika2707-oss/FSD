@@ -1,10 +1,10 @@
-
 import os
 import dj_database_url
 from pathlib import Path
 
 # Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 # Security settings
 SECRET_KEY = os.environ.get(
@@ -14,17 +14,33 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
+
+# Allowed Hosts
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
+    '.vercel.app',
 ]
 
-RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+# Render hostname support
+RENDER_EXTERNAL_HOSTNAME = os.environ.get(
+    'RENDER_EXTERNAL_HOSTNAME'
+)
 
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
-CSRF_TRUSTED_ORIGINS = []
+# Vercel hostname support
+VERCEL_URL = os.environ.get('VERCEL_URL')
+
+if VERCEL_URL:
+    ALLOWED_HOSTS.append(VERCEL_URL)
+
+
+# CSRF Trusted Origins
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.vercel.app',
+]
 
 if RENDER_EXTERNAL_HOSTNAME:
     CSRF_TRUSTED_ORIGINS.append(
@@ -43,6 +59,7 @@ INSTALLED_APPS = [
     'app',
 ]
 
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -54,7 +71,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
 ROOT_URLCONF = 'freelancer.urls'
+
 
 TEMPLATES = [
     {
@@ -71,6 +90,7 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'freelancer.wsgi.application'
 
 
@@ -78,7 +98,7 @@ WSGI_APPLICATION = 'freelancer.wsgi.application'
 DATABASES = {
     'default': dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600
+        conn_max_age=0
     )
 }
 
@@ -126,7 +146,8 @@ STORAGES = {
 
 
 # Email configuration
-# Email notifications will be configured after deployment.
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+
+# Default primary key
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
