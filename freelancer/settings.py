@@ -1,12 +1,11 @@
+
 import os
 import dj_database_url
 from pathlib import Path
 
-# Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Security settings
+# Security
 SECRET_KEY = os.environ.get(
     'SECRET_KEY',
     'django-insecure-local-development-only-key'
@@ -14,41 +13,24 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-
-# Allowed Hosts
+# Allowed hosts
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '.vercel.app',
 ]
 
-# Render hostname support
-RENDER_EXTERNAL_HOSTNAME = os.environ.get(
-    'RENDER_EXTERNAL_HOSTNAME'
-)
-
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-
-# Vercel hostname support
-VERCEL_URL = os.environ.get('VERCEL_URL')
-
-if VERCEL_URL:
-    ALLOWED_HOSTS.append(VERCEL_URL)
-
-
-# CSRF Trusted Origins
+# CSRF settings
 CSRF_TRUSTED_ORIGINS = [
     'https://*.vercel.app',
 ]
 
-if RENDER_EXTERNAL_HOSTNAME:
-    CSRF_TRUSTED_ORIGINS.append(
-        f'https://{RENDER_EXTERNAL_HOSTNAME}'
-    )
+# Login redirects
+LOGIN_URL = '/'
+LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/'
 
-
-# Application definition
+# Applications
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -59,7 +41,7 @@ INSTALLED_APPS = [
     'app',
 ]
 
-
+# Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -71,10 +53,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
 ROOT_URLCONF = 'freelancer.urls'
 
-
+# Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -90,18 +71,26 @@ TEMPLATES = [
     },
 ]
 
-
 WSGI_APPLICATION = 'freelancer.wsgi.application'
 
+# Database: Neon PostgreSQL on Vercel, SQLite locally
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
-# Database
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=0
-    )
-}
-
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=0,
+            ssl_require=True
+        )
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -119,20 +108,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
+# Language and time
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'Asia/Kolkata'
-
 USE_I18N = True
-
 USE_TZ = True
-
 
 # Static files
 STATIC_URL = '/static/'
-
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 STORAGES = {
@@ -144,10 +127,7 @@ STORAGES = {
     },
 }
 
-
-# Email configuration
+# Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-
-# Default primary key
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
